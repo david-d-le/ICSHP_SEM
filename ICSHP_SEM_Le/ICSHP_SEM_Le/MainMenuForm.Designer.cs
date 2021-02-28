@@ -53,7 +53,7 @@ namespace ICSHP_SEM_Le
             this.groupBox1.Controls.Add(this.newGameBtn);
             this.groupBox1.Controls.Add(this.loadGameBtn);
             this.groupBox1.Controls.Add(this.endBtn);
-            this.groupBox1.Location = new System.Drawing.Point(576, 249);
+            this.groupBox1.Location = new System.Drawing.Point(558, 202);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(212, 189);
             this.groupBox1.TabIndex = 2;
@@ -93,7 +93,7 @@ namespace ICSHP_SEM_Le
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.label1.Location = new System.Drawing.Point(12, 413);
+            this.label1.Location = new System.Drawing.Point(12, 360);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(158, 25);
             this.label1.TabIndex = 4;
@@ -103,15 +103,14 @@ namespace ICSHP_SEM_Le
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(782, 403);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.mainMenuLabel1);
             this.Controls.Add(this.groupBox1);
             this.Name = "MainMenuForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "MainMenuForm";
+            this.Text = "Tick Tack Toe - David Le";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainMenuForm_FormClosing);
-            this.Load += new System.EventHandler(this.MainMenuForm_Load);
             this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -11,12 +11,6 @@ namespace ICSHP_SEM_Le
             InitializeComponent();
         }
 
-        private void MainMenuForm_Load(object sender, EventArgs e)
-        {
-
-        }
-
-
         private void endBtn_Click(object sender, EventArgs e)
         {
             Close();
@@ -45,10 +39,10 @@ namespace ICSHP_SEM_Le
 
         private void newGameBtn_Click(object sender, EventArgs e)
         {
-            string input = InputDialog.Show("Insert board size from 3 to 100. Board will have n*n dimmension","Insert size");
+            string input = InputDialog.Show("Insert board size from 5 to 30. Board will have n*n dimmension","Insert size");
             if (input == "")
                 return;
-            else if (int.TryParse(input, out int size) && size >= 3 && size <= 100)
+            else if (int.TryParse(input, out int size) && size >= 5 && size <= 30)
             {
                 Game game = new Game(size);
                 GameForm form = new GameForm(this, game);
@@ -57,7 +51,7 @@ namespace ICSHP_SEM_Le
             }
             else
             {
-                MessageBox.Show("Invalid board size. Please insert whole numbers only from 3 to 100", "Invalid input", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("Invalid board size. Please insert whole numbers only from 5 to 30", "Invalid input", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
             
         }

@@ -8,7 +8,7 @@ namespace ICSHP_SEM_Le
     {
         #region Game properties and attributes
         public GameBoard GameBoard { get; set; }
-        public static bool XsTurn { get; set; }
+        public bool XsTurn { get; set; }
         #endregion
 
         #region Game constructors and associated methods
@@ -58,7 +58,7 @@ namespace ICSHP_SEM_Le
         private void LoadGame(Stream fileStream)
         {
             CheckSaveGameFileFormat(fileStream, out int boardSize, out bool?[,] board);
-            GameBoard = new GameBoard(boardSize, board);
+            GameBoard = new GameBoard(this, boardSize, board);
         }
 
 
@@ -70,11 +70,11 @@ namespace ICSHP_SEM_Le
         public Game(int baordSize)
         {
             XsTurn = true;
-            GameBoard = new GameBoard(baordSize);
+            GameBoard = new GameBoard(this, baordSize);
         }
         #endregion
 
-        public static string XsTurnToString()
+        public string XsTurnToString()
         {
             return XsTurn ? "x" : "o";
         }

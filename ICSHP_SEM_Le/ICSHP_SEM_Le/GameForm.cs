@@ -35,10 +35,10 @@ namespace ICSHP_SEM_Le
                 for (int j = 0; j < GameObject.GameBoard.BoardSize; j++)
                 {
                     splitContainer1.Panel2.Controls.Add(GameObject.GameBoard.Buttons[i, j]);
-                    //TODO load game (new or saved), draw things etc
                 }
             }
-            
+            SetPlayerLabelFontColor(GameObject.XsTurn);
+            SetPlayerLabelText(GameObject.XsTurnToString());
         }
 
         private void SaveGame()
@@ -52,9 +52,9 @@ namespace ICSHP_SEM_Le
             if ((fileStream = dialog.OpenFile()) != null)
             {
                 StreamWriter writer = new StreamWriter(fileStream, Encoding.UTF8);
-                writer.WriteLine(Game.XsTurnToString());
+                writer.WriteLine(GameObject.XsTurnToString());
                 writer.WriteLine(GameObject.GameBoard.BoardSize);
-                writer.WriteLine(GameObject.GameBoard.BoardBoolToString());
+                writer.WriteLine(GameObject.GameBoard.BoardToString());
                 writer.Close();
                 fileStream.Close();
             }
@@ -64,6 +64,7 @@ namespace ICSHP_SEM_Le
         private void GameForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             //TODO end game exit (when someone wins)
+            //TODO //e = new FormClosingEventArgs(CloseReason.UserClosing,false); 
             if (MessageBox.Show("Do you want to exit from this game?", "Confirmation",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
@@ -85,5 +86,30 @@ namespace ICSHP_SEM_Le
         {
             mainMenu.Show();
         }
+
+        #region public methods
+        public void SetPlayerLabelText(string text)
+        {
+            playerLabel.Text = text;
+        }
+
+        public void SetPlayerLabelFontColor(bool xPlaying)
+        {
+            playerLabel.ForeColor = xPlaying ? Color.Red : Color.Blue;
+        }
+
+        public void SetWinnerLabelText(string text)
+        {
+            winnerLabel.Text = text;
+        }
+
+        public void SetWinnerLabelFontColor(bool? playerXWins)
+        {
+            if (playerXWins == null)
+                playerLabel.ForeColor = Color.Black;
+            else
+                playerLabel.ForeColor = playerXWins == true ? Color.Red : Color.Blue;
+        }
+        #endregion
     }
 }
