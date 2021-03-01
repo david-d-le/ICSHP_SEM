@@ -63,23 +63,23 @@ namespace ICSHP_SEM_Le
 
         private void GameForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            //TODO end game exit (when someone wins)
-            //TODO //e = new FormClosingEventArgs(CloseReason.UserClosing,false); 
-            if (MessageBox.Show("Do you want to exit from this game?", "Confirmation",
+            if (GameObject.GameOver == false)
+            {
+                if (MessageBox.Show("Do you want to exit from this game?", "Confirmation",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                if (MessageBox.Show("Do you want to save this game progress?", "Confirmation",
-                        MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    SaveGame();
+                    if (MessageBox.Show("Do you want to save this game progress?", "Confirmation",
+                            MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        SaveGame();
+                    }
+                    e.Cancel = false;
                 }
-                e.Cancel = false;
+                else
+                {
+                    e.Cancel = true;
+                }
             }
-            else
-            {
-                e.Cancel = true;
-            }
-
         }
 
         private void GameForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -106,10 +106,15 @@ namespace ICSHP_SEM_Le
         public void SetWinnerLabelFontColor(bool? playerXWins)
         {
             if (playerXWins == null)
-                playerLabel.ForeColor = Color.Black;
+                winnerLabel.ForeColor = Color.Black;
             else
-                playerLabel.ForeColor = playerXWins == true ? Color.Red : Color.Blue;
+                winnerLabel.ForeColor = playerXWins == true ? Color.Red : Color.Blue;
         }
+
+        public SplitterPanel GetSplitterPanel2() {
+            return splitContainer1.Panel2;
+        }
+
         #endregion
     }
 }

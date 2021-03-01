@@ -30,10 +30,10 @@ namespace ICSHP_SEM_Le
         private void InitializeComponent()
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.winnerLabel = new System.Windows.Forms.Label();
             this.playerLabel = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.winnerLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -58,6 +58,15 @@ namespace ICSHP_SEM_Le
             this.splitContainer1.Size = new System.Drawing.Size(1262, 673);
             this.splitContainer1.SplitterDistance = 300;
             this.splitContainer1.TabIndex = 0;
+            // 
+            // winnerLabel
+            // 
+            this.winnerLabel.AutoSize = true;
+            this.winnerLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.winnerLabel.Location = new System.Drawing.Point(12, 333);
+            this.winnerLabel.Name = "winnerLabel";
+            this.winnerLabel.Size = new System.Drawing.Size(0, 55);
+            this.winnerLabel.TabIndex = 3;
             // 
             // playerLabel
             // 
@@ -88,15 +97,6 @@ namespace ICSHP_SEM_Le
             this.label1.Size = new System.Drawing.Size(259, 51);
             this.label1.TabIndex = 0;
             this.label1.Text = "Tic Tac Toe";
-            // 
-            // winnerLabel
-            // 
-            this.winnerLabel.AutoSize = true;
-            this.winnerLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.winnerLabel.Location = new System.Drawing.Point(21, 326);
-            this.winnerLabel.Name = "winnerLabel";
-            this.winnerLabel.Size = new System.Drawing.Size(0, 69);
-            this.winnerLabel.TabIndex = 3;
             // 
             // GameForm
             // 

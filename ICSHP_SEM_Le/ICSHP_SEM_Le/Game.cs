@@ -9,6 +9,7 @@ namespace ICSHP_SEM_Le
         #region Game properties and attributes
         public GameBoard GameBoard { get; set; }
         public bool XsTurn { get; set; }
+        public bool GameOver { get; set; }
         #endregion
 
         #region Game constructors and associated methods
@@ -64,11 +65,13 @@ namespace ICSHP_SEM_Le
 
         public Game(Stream fileStream)
         {
+            GameOver = false;
             LoadGame(fileStream);
         }
 
         public Game(int baordSize)
         {
+            GameOver = false;
             XsTurn = true;
             GameBoard = new GameBoard(this, baordSize);
         }
