@@ -30,6 +30,7 @@ namespace ICSHP_SEM_Le
         private void InitializeComponent()
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.mainMenuBtn = new System.Windows.Forms.Button();
             this.winnerLabel = new System.Windows.Forms.Label();
             this.playerLabel = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -47,6 +48,8 @@ namespace ICSHP_SEM_Le
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.AutoScroll = true;
+            this.splitContainer1.Panel1.Controls.Add(this.mainMenuBtn);
             this.splitContainer1.Panel1.Controls.Add(this.winnerLabel);
             this.splitContainer1.Panel1.Controls.Add(this.playerLabel);
             this.splitContainer1.Panel1.Controls.Add(this.label2);
@@ -54,10 +57,24 @@ namespace ICSHP_SEM_Le
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.AutoScroll = true;
             this.splitContainer1.Panel2.BackColor = System.Drawing.SystemColors.Window;
             this.splitContainer1.Size = new System.Drawing.Size(1262, 673);
             this.splitContainer1.SplitterDistance = 300;
             this.splitContainer1.TabIndex = 0;
+            // 
+            // mainMenuBtn
+            // 
+            this.mainMenuBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.mainMenuBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.mainMenuBtn.Location = new System.Drawing.Point(20, 598);
+            this.mainMenuBtn.Name = "mainMenuBtn";
+            this.mainMenuBtn.Size = new System.Drawing.Size(251, 63);
+            this.mainMenuBtn.TabIndex = 4;
+            this.mainMenuBtn.Text = "Main menu";
+            this.mainMenuBtn.UseVisualStyleBackColor = true;
+            this.mainMenuBtn.Click += new System.EventHandler(this.mainMenuBtn_Click);
             // 
             // winnerLabel
             // 
@@ -65,7 +82,7 @@ namespace ICSHP_SEM_Le
             this.winnerLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.winnerLabel.Location = new System.Drawing.Point(12, 333);
             this.winnerLabel.Name = "winnerLabel";
-            this.winnerLabel.Size = new System.Drawing.Size(0, 55);
+            this.winnerLabel.Size = new System.Drawing.Size(0, 44);
             this.winnerLabel.TabIndex = 3;
             // 
             // playerLabel
@@ -125,5 +142,6 @@ namespace ICSHP_SEM_Le
         private System.Windows.Forms.Label playerLabel;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label winnerLabel;
+        private System.Windows.Forms.Button mainMenuBtn;
     }
 }

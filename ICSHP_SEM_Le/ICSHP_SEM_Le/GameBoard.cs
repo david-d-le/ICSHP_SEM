@@ -13,6 +13,8 @@ namespace ICSHP_SEM_Le
         private const int BUTTON_SIZE = 30; // can't be changed
         private const int STEPS = 50;
         private const int STEPS_HALF = STEPS/2;
+        public const int MIN_BOARD_SIZE = 5;
+        public const int MAX_BOARD_SIZE = 30;
         #endregion
 
         #region GameBoard properties and attributes
@@ -128,31 +130,31 @@ namespace ICSHP_SEM_Le
 
         private void CrossOutWinner(int rowL, int rowR, int diagLU, int diagRD, int diagLD, int diagRU, int columnU, int columnD, int x, int y)
         {
-            GameForm myForm = Buttons[0, 0].FindForm() as GameForm;
-            SplitterPanel panel = myForm.GetSplitterPanel2();
+            //GameForm myForm = Buttons[0, 0].FindForm() as GameForm;
+            //SplitterPanel panel = myForm.GetSplitterPanel2();
 
-            if (rowL + rowR + 1 >= 5){
-                int startX = Buttons[x - rowL, y].Location.X;
-                int startY = Buttons[x, y].Location.Y;
-                Label label = new Label() {
-                    Location = new Point(startX, startY),
-                    Size = new Size((rowL + rowR + 1) * BUTTON_SIZE, BUTTON_SIZE),
-                    Text = "HOUBY"
-                };
-                myForm.GetSplitterPanel2().Controls.Add(label);
-                label.BringToFront();
-                Graphics g = label.CreateGraphics();
-                g.DrawLine(new Pen(Color.Black, 3), new Point(startX, startY+ BUTTON_SIZE/2), new Point(startX+(rowL + rowR + 1)* BUTTON_SIZE, BUTTON_SIZE/2));
+            //if (rowL + rowR + 1 >= 5){
+            //    int startX = Buttons[x - rowL, y].Location.X;
+            //    int startY = Buttons[x, y].Location.Y;
+            //    Label label = new Label() {
+            //        Location = new Point(startX, startY),
+            //        Size = new Size((rowL + rowR + 1) * BUTTON_SIZE, BUTTON_SIZE),
+            //        Text = "HOUBY"
+            //    };
+            //    myForm.GetSplitterPanel2().Controls.Add(label);
+            //    label.BringToFront();
+            //    Graphics g = label.CreateGraphics();
+            //    g.DrawLine(new Pen(Color.Black, 3), new Point(startX, startY+ BUTTON_SIZE/2), new Point(startX+(rowL + rowR + 1)* BUTTON_SIZE, BUTTON_SIZE/2));
                 
-            }
-            else if(diagLU + diagRD + 1 >= 5){
+            //}
+            //else if(diagLU + diagRD + 1 >= 5){
 
-            }else if (diagLD + diagRU + 1 >= 5){
+            //}else if (diagLD + diagRU + 1 >= 5){
 
-            }else
-            {
-                //TODO fix all
-            }
+            //}else
+            //{
+            //    //TODO fix all
+            //}
         }
 
         private void CheckWinnerFromLastClick(int i, int j, bool xClicked)
@@ -217,14 +219,12 @@ namespace ICSHP_SEM_Le
             if (rowL + rowR + 1 >= 5 || diagLU + diagRD + 1 >= 5 || diagLD + diagRU + 1 >= 5  || columnU + columnD + 1 >= 5)
             {
                 string message = xClicked ? "Player X wins" : "Player O wins";
-                foreach (BoardButton button in Buttons){
-                    button.Enabled = false;
-                }
                 myForm.SetWinnerLabelFontColor(xClicked);
                 myForm.SetWinnerLabelText(message);
                 CrossOutWinner(rowL, rowR, diagLU, diagRD, diagLD, diagRU, columnU, columnD, j, i);
                 MessageBox.Show(message, "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 GameObject.GameOver = true;
+                
                 //TODO cross out winner
             }
             else if (NumOfFreeButtons <= 0)
@@ -252,7 +252,7 @@ namespace ICSHP_SEM_Le
         void button_Click(object sender, EventArgs e, int i, int j)
         {
             BoardButton button = sender as BoardButton;
-            if(button.XClicked != null)
+            if(button.XClicked != null || gameObject.GameOver)
                 return;
             --NumOfFreeButtons;
             button.XClicked = GameObject.XsTurn;

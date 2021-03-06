@@ -30,6 +30,8 @@ namespace ICSHP_SEM_Le
 
         private void GameForm_Load(object sender, EventArgs e)
         {
+            WaitDialog wd = new WaitDialog("Your level is getting ready. Please wait...", "Please wait...");
+            wd.Show();
             for (int i = 0; i < GameObject.GameBoard.BoardSize; i++)
             {
                 for (int j = 0; j < GameObject.GameBoard.BoardSize; j++)
@@ -39,6 +41,7 @@ namespace ICSHP_SEM_Le
             }
             SetPlayerLabelFontColor(GameObject.XsTurn);
             SetPlayerLabelText(GameObject.XsTurnToString());
+            wd.Close();
         }
 
         private void SaveGame()
@@ -116,5 +119,10 @@ namespace ICSHP_SEM_Le
         }
 
         #endregion
+
+        private void mainMenuBtn_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }

@@ -40,6 +40,7 @@ namespace ICSHP_SEM_Le
             // 
             // endBtn
             // 
+            this.endBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.endBtn.Location = new System.Drawing.Point(6, 133);
             this.endBtn.Name = "endBtn";
             this.endBtn.Size = new System.Drawing.Size(200, 50);
@@ -61,6 +62,7 @@ namespace ICSHP_SEM_Le
             // 
             // newGameBtn
             // 
+            this.newGameBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.newGameBtn.Location = new System.Drawing.Point(6, 21);
             this.newGameBtn.Name = "newGameBtn";
             this.newGameBtn.Size = new System.Drawing.Size(200, 50);
@@ -71,6 +73,7 @@ namespace ICSHP_SEM_Le
             // 
             // loadGameBtn
             // 
+            this.loadGameBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.loadGameBtn.Location = new System.Drawing.Point(6, 77);
             this.loadGameBtn.Name = "loadGameBtn";
             this.loadGameBtn.Size = new System.Drawing.Size(200, 50);

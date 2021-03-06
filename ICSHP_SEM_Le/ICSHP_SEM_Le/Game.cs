@@ -21,7 +21,8 @@ namespace ICSHP_SEM_Le
         {
             StreamReader savedGameFile = new StreamReader(fileStream);
             if (char.TryParse(savedGameFile.ReadLine(), out char turnChar) && IsPlayerChar(turnChar)
-                && int.TryParse(savedGameFile.ReadLine(), out boardSize))
+                && int.TryParse(savedGameFile.ReadLine(), out boardSize) 
+                && boardSize >= GameBoard.MIN_BOARD_SIZE && boardSize <= GameBoard.MAX_BOARD_SIZE)
             {
                 XsTurn = (turnChar == 'x') ? true : false;
                 board = new bool?[boardSize, boardSize];
@@ -50,7 +51,8 @@ namespace ICSHP_SEM_Le
                     }
                 }
                 //if there are more lines than expected
-                if (savedGameFile.ReadLine() != null)
+                string rest = savedGameFile.ReadToEnd().TrimEnd('\r', '\n');
+                if (rest.Length != 0)
                     throw new ArgumentException("Not a valid saveGame file");
                 return;
             }

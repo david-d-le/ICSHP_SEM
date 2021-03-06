@@ -39,10 +39,11 @@ namespace ICSHP_SEM_Le
 
         private void newGameBtn_Click(object sender, EventArgs e)
         {
-            string input = InputDialog.Show("Insert board size from 5 to 30. Board will have n*n dimmension","Insert size");
+            
+            string input = InputDialog.Show($"Insert board size from {GameBoard.MIN_BOARD_SIZE} to {GameBoard.MAX_BOARD_SIZE}. Board will have n*n dimmension","Insert size");
             if (input == "")
                 return;
-            else if (int.TryParse(input, out int size) && size >= 5 && size <= 30)
+            else if (int.TryParse(input, out int size) && size >= GameBoard.MIN_BOARD_SIZE && size <= GameBoard.MAX_BOARD_SIZE)
             {
                 Game game = new Game(size);
                 GameForm form = new GameForm(this, game);
