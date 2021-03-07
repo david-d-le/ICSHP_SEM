@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Collections.Generic;
+
 namespace ICSHP_SEM_Le
 {
     public class GameBoard
@@ -12,9 +14,10 @@ namespace ICSHP_SEM_Le
         #region constants
         private const int BUTTON_SIZE = 30; // can't be changed
         private const int STEPS = 50;
-        private const int STEPS_HALF = STEPS/2;
+        private const int STEPS_HALF = STEPS / 2;
         public const int MIN_BOARD_SIZE = 5;
         public const int MAX_BOARD_SIZE = 30;
+
         #endregion
 
         #region GameBoard properties and attributes
@@ -35,16 +38,17 @@ namespace ICSHP_SEM_Le
 
         public BoardButton[,] Buttons { get; set; }
         #endregion
-        
+
         #region GameBoard methods associated with ctors
-        private void GenerateButtons(int boardSize, bool? [,] boardBool)
+        private void GenerateButtons(int boardSize, bool?[,] boardBool)
         {
             Buttons = new BoardButton[boardSize, boardSize];
             for (int i = 0; i < boardSize; i++)
             {
                 for (int j = 0; j < boardSize; j++)
                 {
-                    Buttons[i, j] = new BoardButton() {
+                    Buttons[i, j] = new BoardButton()
+                    {
                         Size = new Size(BUTTON_SIZE, BUTTON_SIZE),
                         Location = new Point(j * BUTTON_SIZE + 50, i * BUTTON_SIZE + 50),
                         FlatStyle = FlatStyle.Flat,
@@ -56,10 +60,10 @@ namespace ICSHP_SEM_Le
                     int y = j;
                     Buttons[i, j].Click += delegate (object sender2, EventArgs e2)
                     {
-                        button_Click(sender2, e2, x, y);
+                        Button_Click(sender2, e2, x, y);
                     };
 
-                    Draw(i,j, boardBool[i,j]);
+                    Draw(i, j, boardBool[i, j]);
                 }
             }
         }
@@ -69,25 +73,28 @@ namespace ICSHP_SEM_Le
             if (step >= STEPS_HALF)
             {
                 g.DrawLine(new Pen(Color.Red, 3), new Point(5, 5), new Point(BUTTON_SIZE - 5, BUTTON_SIZE - 5));
-                g.DrawLine(new Pen(Color.Red, 3), new PointF(25, 5), new PointF(BUTTON_SIZE-5 - (step - STEPS_HALF) / (STEPS_HALF/20f), 5 + (step - STEPS_HALF) / (STEPS_HALF / 20f)));
+                g.DrawLine(new Pen(Color.Red, 3), new PointF(25, 5), new PointF(BUTTON_SIZE - 5 - (step - STEPS_HALF) / (STEPS_HALF / 20f), 5 + (step - STEPS_HALF) / (STEPS_HALF / 20f)));
             }
             else
             {
                 g.DrawLine(new Pen(Color.Red, 3), new Point(5, 5), new PointF(step / (STEPS_HALF / 20f) + 5, step / (STEPS_HALF / 20f) + 5));
             }
-                
+
         }
 
         private void DrawO(Graphics g, int step)
         {
-            g.DrawArc(new Pen(Color.Blue, 3), new Rectangle(5, 5, 20, 20), 0, (360f / STEPS) * (step+1));
+            g.DrawArc(new Pen(Color.Blue, 3), new Rectangle(5, 5, 20, 20), 0, (360f / STEPS) * (step + 1));
         }
 
-        private void Draw(int i, int j,bool? player)
+        private void Draw(int i, int j, bool? player)
         {
-            Graphics g = Buttons[i, j].CreateGraphics();
-            Timer timer1 = new Timer();
-            timer1.Interval = 1; // in miliseconds
+            Buttons[i, j].Graphics = Buttons[i, j].CreateGraphics();
+            Graphics g = Buttons[i, j].Graphics;
+            Timer timer1 = new Timer
+            {
+                Interval = 1 // in miliseconds
+            };
             int step = 0;
 
             switch (player)
@@ -128,39 +135,134 @@ namespace ICSHP_SEM_Le
             }
         }
 
+        private void CrossOutButton(int x, int y, float startX, float startY, float endX, float endY, Graphics g)
+        {
+            g.DrawLine(new Pen(Color.Black, 3), new PointF(startX, startY), new PointF(endX, endY));
+        }
+        private void CrossOutRow(int rowL, int rowR, int x, int y)
+        {
+            Queue<Timer> timerStack = new Queue<Timer>();
+            for (int i = rowL; i >= 1; i--)
+            {
+                Timer timer1 = new Timer{Interval = 1};
+                int step = 0;
+                BoardButton button = Buttons[x, y - i];
+                timer1.Tick += delegate (object sender2, EventArgs e2)
+                {
+                    if (step < 25)
+                        CrossOutButton(x, y - i, 0, BUTTON_SIZE / 2, BUTTON_SIZE * (step++ / 25f), BUTTON_SIZE / 2, button.CreateGraphics());
+                    else
+                    {
+                        button.CrossedRow = true;
+                        timer1.Stop();
+                        if (timerStack.Count > 0)
+                            timerStack.Dequeue().Start();
+                    }
+                };
+                timerStack.Enqueue(timer1);
+            }
+            // clicked button
+            Timer timer2 = new Timer{Interval = 1};
+            int step2 = 0;
+            timer2.Tick += delegate (object sender2, EventArgs e2)
+            {
+                if (step2 < 25)
+                    CrossOutButton(x, y, 0, BUTTON_SIZE / 2, BUTTON_SIZE * (step2++ / 25f), BUTTON_SIZE / 2, Buttons[x, y].CreateGraphics());
+                else
+                {
+                    timer2.Stop();
+                    if (timerStack.Count > 0)
+                        timerStack.Dequeue().Start();
+                }
+            };
+            Buttons[x, y].CrossedRow = true;
+            timerStack.Enqueue(timer2);
+            for (int i = 1; i <= rowR; i++)
+            {
+                Timer timer1 = new Timer { Interval = 1 };
+                int step = 0;
+                BoardButton button = Buttons[x, y + i];
+                timer1.Tick += delegate (object sender2, EventArgs e2)
+                {
+                    if (step < 25)
+                        CrossOutButton(x, y + i, 0, BUTTON_SIZE / 2, BUTTON_SIZE * (step++ / 25f), BUTTON_SIZE / 2, button.CreateGraphics());
+                    else
+                    {
+                        button.CrossedRow = true;
+                        timer1.Stop();
+                        if (timerStack.Count > 0)
+                            timerStack.Dequeue().Start();
+                    }
+                };
+                timerStack.Enqueue(timer1);
+            }
+
+            timerStack.Dequeue().Start();
+        }
+
+        private void CrossOutColumn(int columnU, int columnD, int x, int y)
+        {
+            for (int i = 1; i <= columnU; i++)
+            {
+                Buttons[x - i, y].CrossedColumn = true;
+                ////CrossOutButton(x - i, y, BUTTON_SIZE / 2, 0, BUTTON_SIZE / 2, BUTTON_SIZE);
+            }
+            Buttons[x, y].CrossedColumn = true;
+            ////CrossOutButton(x, y, BUTTON_SIZE / 2, 0, BUTTON_SIZE / 2, BUTTON_SIZE);
+            for (int i = 1; i <= columnD; i++)
+            {
+                Buttons[x + i, y].CrossedColumn = true;
+                ////CrossOutButton(x + i, y, BUTTON_SIZE / 2, 0, BUTTON_SIZE / 2, BUTTON_SIZE);
+            }
+        }
+
+        private void CrossOutDiagonalLeft(int diagLU, int diagRD, int x, int y)
+        {
+            for (int i = 1; i <= diagLU; i++)
+            {
+                Buttons[x - i, y - i].CrossedDiagonalLeft = true;
+                ////CrossOutButton(x - i, y - i, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
+            }
+            Buttons[x, y].CrossedDiagonalLeft = true;
+            ////CrossOutButton(x, y, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
+            for (int i = 1; i <= diagRD; i++)
+            {
+                Buttons[x + i, y + i].CrossedDiagonalLeft = true;
+                ////CrossOutButton(x + i, y + i, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
+            }
+        }
+
+        private void CrossOutDiagonalRight(int diagLD, int diagRU, int x, int y)
+        {
+            for (int i = 1; i <= diagLD; i++)
+            {
+                Buttons[x + i, y - i].CrossedDiagonalRight = true;
+                ////CrossOutButton(x + i, y - i, BUTTON_SIZE, 0, 0, BUTTON_SIZE);
+            }
+            Buttons[x, y].CrossedDiagonalRight = true;
+            ////CrossOutButton(x, y, BUTTON_SIZE, 0, 0, BUTTON_SIZE);
+            for (int i = 1; i <= diagRU; i++)
+            {
+                Buttons[x - i, y + i].CrossedDiagonalRight = true;
+                ////CrossOutButton(x - i, y + i, BUTTON_SIZE, 0, 0, BUTTON_SIZE);
+            }
+        }
         private void CrossOutWinner(int rowL, int rowR, int diagLU, int diagRD, int diagLD, int diagRU, int columnU, int columnD, int x, int y)
         {
-            //GameForm myForm = Buttons[0, 0].FindForm() as GameForm;
-            //SplitterPanel panel = myForm.GetSplitterPanel2();
-
-            //if (rowL + rowR + 1 >= 5){
-            //    int startX = Buttons[x - rowL, y].Location.X;
-            //    int startY = Buttons[x, y].Location.Y;
-            //    Label label = new Label() {
-            //        Location = new Point(startX, startY),
-            //        Size = new Size((rowL + rowR + 1) * BUTTON_SIZE, BUTTON_SIZE),
-            //        Text = "HOUBY"
-            //    };
-            //    myForm.GetSplitterPanel2().Controls.Add(label);
-            //    label.BringToFront();
-            //    Graphics g = label.CreateGraphics();
-            //    g.DrawLine(new Pen(Color.Black, 3), new Point(startX, startY+ BUTTON_SIZE/2), new Point(startX+(rowL + rowR + 1)* BUTTON_SIZE, BUTTON_SIZE/2));
-                
-            //}
-            //else if(diagLU + diagRD + 1 >= 5){
-
-            //}else if (diagLD + diagRU + 1 >= 5){
-
-            //}else
-            //{
-            //    //TODO fix all
-            //}
+            if (rowL + rowR + 1 >= 5)
+                CrossOutRow(rowL, rowR, x, y);
+            else if (columnU + columnD + 1 >= 5)
+                CrossOutColumn(columnU, columnD, x, y);
+            else if (diagLU + diagRD + 1 >= 5)
+                CrossOutDiagonalLeft(diagLU, diagRD, x, y);
+            else if (diagLD + diagRU + 1 >= 5)
+                CrossOutDiagonalRight(diagLD, diagRU, x, y);
         }
 
         private void CheckWinnerFromLastClick(int i, int j, bool xClicked)
         {
             GameForm myForm = Buttons[0, 0].FindForm() as GameForm;
-            
+
             int rowL, rowR, columnD, columnU, diagLU, diagLD, diagRU, diagRD;
             bool rowLBool, rowRBool, columnDBool, columnUBool, diagLUBool, diagLDBool, diagRUBool, diagRDBool;
             rowLBool = rowRBool = columnDBool = columnUBool = diagLUBool = diagLDBool = diagRUBool = diagRDBool = true;
@@ -170,61 +272,60 @@ namespace ICSHP_SEM_Le
                 if (j - k >= 0)
                 {
                     //row left side
-                    rowLBool = rowLBool ? xClicked == Buttons[i, j - k].XClicked : false;
+                    rowLBool = rowLBool && xClicked == Buttons[i, j - k].XClicked;
                     rowL = rowLBool ? ++rowL : rowL;
                     //diagonal up left side
                     if (i - k >= 0)
                     {
-                        diagLUBool = diagLUBool ? xClicked == Buttons[i - k, j - k].XClicked : false;
+                        diagLUBool = diagLUBool && xClicked == Buttons[i - k, j - k].XClicked;
                         diagLU = diagLUBool ? ++diagLU : diagLU;
                     }
                     //diagonal down left side
                     if (i + k < BoardSize)
                     {
-                        diagLDBool = diagLDBool ? xClicked == Buttons[i + k, j - k].XClicked : false;
+                        diagLDBool = diagLDBool && xClicked == Buttons[i + k, j - k].XClicked;
                         diagLD = diagLDBool ? ++diagLD : diagLD;
                     }
 
                 }
                 if (j + k < boardSize)
                 {
-                    rowRBool = rowRBool ? xClicked == Buttons[i, j + k].XClicked : false;
+                    rowRBool = rowRBool && xClicked == Buttons[i, j + k].XClicked;
                     rowR = rowRBool ? ++rowR : rowR;
                     //diagonal up right side
                     if (i - k >= 0)
                     {
-                        diagRUBool = diagRUBool ? xClicked == Buttons[i - k, j + k].XClicked : false;
+                        diagRUBool = diagRUBool && xClicked == Buttons[i - k, j + k].XClicked;
                         diagRU = diagRUBool ? ++diagRU : diagRU;
                     }
                     //diagonal down right side
                     if (i + k < BoardSize)
                     {
-                        diagRDBool = diagRDBool ? xClicked == Buttons[i + k, j + k].XClicked : false;
+                        diagRDBool = diagRDBool && xClicked == Buttons[i + k, j + k].XClicked;
                         diagRD = diagRDBool ? ++diagRD : diagRD;
-                        
+
                     }
                 }
                 if (i - k >= 0)
                 {
-                    columnUBool = columnUBool ? xClicked == Buttons[i - k, j].XClicked : false;
+                    columnUBool = columnUBool && xClicked == Buttons[i - k, j].XClicked;
                     columnU = columnUBool ? ++columnU : columnU;
                 }
                 if (i + k < boardSize)
                 {
-                    columnDBool = columnDBool ? xClicked == Buttons[i + k, j].XClicked : false;
+                    columnDBool = columnDBool && xClicked == Buttons[i + k, j].XClicked;
                     columnD = columnDBool ? ++columnD : columnD;
-                    
+
                 }
             }
-            if (rowL + rowR + 1 >= 5 || diagLU + diagRD + 1 >= 5 || diagLD + diagRU + 1 >= 5  || columnU + columnD + 1 >= 5)
+            if (rowL + rowR + 1 >= 5 || diagLU + diagRD + 1 >= 5 || diagLD + diagRU + 1 >= 5 || columnU + columnD + 1 >= 5)
             {
                 string message = xClicked ? "Player X wins" : "Player O wins";
                 myForm.SetWinnerLabelFontColor(xClicked);
-                myForm.SetWinnerLabelText(message);
-                CrossOutWinner(rowL, rowR, diagLU, diagRD, diagLD, diagRU, columnU, columnD, j, i);
-                MessageBox.Show(message, "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                myForm.SetWinnerLabelText(message);                
+                CrossOutWinner(rowL, rowR, diagLU, diagRD, diagLD, diagRU, columnU, columnD, i, j);
                 GameObject.GameOver = true;
-                
+
                 //TODO cross out winner
             }
             else if (NumOfFreeButtons <= 0)
@@ -249,10 +350,10 @@ namespace ICSHP_SEM_Le
             myForm.SetPlayerLabelText(GameObject.XsTurnToString());
         }
 
-        void button_Click(object sender, EventArgs e, int i, int j)
+        void Button_Click(object sender, EventArgs e, int i, int j)
         {
             BoardButton button = sender as BoardButton;
-            if(button.XClicked != null || gameObject.GameOver)
+            if (button.XClicked != null || gameObject.GameOver)
                 return;
             --NumOfFreeButtons;
             button.XClicked = GameObject.XsTurn;
@@ -328,15 +429,15 @@ namespace ICSHP_SEM_Le
 
         private bool CheckDialonals(int boardSize, bool?[,] board)
         {
-            for (int i = 0; i <= boardSize-5; i++)
+            for (int i = 0; i <= boardSize - 5; i++)
             {
-                for (int j = 0; j <= boardSize-5; j++)
+                for (int j = 0; j <= boardSize - 5; j++)
                 {
                     if ((board[i, j] == true && board[i + 1, j + 1] == true && board[i + 2, j + 2] == true
                             && board[i + 3, j + 3] == true && board[i + 4, j + 4] == true)
-                        || (board[i, j] == false && board[i + 1, j + 1] == false && board[i + 2, j + 2] == false 
+                        || (board[i, j] == false && board[i + 1, j + 1] == false && board[i + 2, j + 2] == false
                             && board[i + 3, j + 3] == false && board[i + 4, j + 4] == false)
-                        || (board[i, boardSize-j-1] == true && board[i + 1, boardSize - (j + 2)] == true && board[i + 2, boardSize - (j + 3)] == true
+                        || (board[i, boardSize - j - 1] == true && board[i + 1, boardSize - (j + 2)] == true && board[i + 2, boardSize - (j + 3)] == true
                             && board[i + 3, boardSize - (j + 4)] == true && board[i + 4, boardSize - (j + 5)] == true)
                         || (board[i, boardSize - j - 1] == false && board[i + 1, boardSize - (j + 2)] == false && board[i + 2, boardSize - (j + 3)] == false
                             && board[i + 3, boardSize - (j + 4)] == false && board[i + 4, boardSize - (j + 5)] == false))
@@ -396,40 +497,55 @@ namespace ICSHP_SEM_Le
         #region custom Button class
         public class BoardButton : Button
         {
+            #region BoardButton properties
             public bool? XClicked { get; set; }
             public bool Painted { get; set; }
-            public BoardButton()
-            {
+            public bool CrossedRow { get; set; }
+            public bool CrossedColumn { get; set; }
+            public bool CrossedDiagonalLeft { get; set; }
+            public bool CrossedDiagonalRight { get; set; }
 
+            public Graphics Graphics { get; set; }
+            #endregion
+
+            #region BoardButton constructors
+            public BoardButton(){
             }
 
             public BoardButton(bool xClicked)
             {
                 XClicked = xClicked;
             }
+            #endregion
 
             protected override void OnPaint(PaintEventArgs pevent)
             {
                 base.OnPaint(pevent);
-
                 if (Painted)
                 {
                     Graphics g = pevent.Graphics;
-                    if (XClicked == true) {
+                    if (XClicked == true)
+                    {
                         g.Clear(Color.Transparent);
-                        g.FillRectangle(Brushes.White, new Rectangle(1,1, BUTTON_SIZE-2, BUTTON_SIZE-2));
-                        g.DrawLine(new Pen(Color.Red, 3), new Point(5, 5), new Point(BUTTON_SIZE-5, BUTTON_SIZE-5));
-                        g.DrawLine(new Pen(Color.Red, 3), new Point(BUTTON_SIZE-5, 5), new Point(5, BUTTON_SIZE-5));
+                        g.FillRectangle(Brushes.White, new Rectangle(1, 1, BUTTON_SIZE - 2, BUTTON_SIZE - 2));
+                        g.DrawLine(new Pen(Color.Red, 3), new Point(5, 5), new Point(BUTTON_SIZE - 5, BUTTON_SIZE - 5));
+                        g.DrawLine(new Pen(Color.Red, 3), new Point(BUTTON_SIZE - 5, 5), new Point(5, BUTTON_SIZE - 5));
                     }
-                    else if(XClicked == false)
+                    else if (XClicked == false)
                     {
                         g.DrawArc(new Pen(Color.Blue, 3), new Rectangle(5, 5, 20, 20), 0, 360);
                     }
+                    if (CrossedRow)
+                        g.DrawLine(new Pen(Color.Black, 3), new Point(0, BUTTON_SIZE / 2), new Point(BUTTON_SIZE, BUTTON_SIZE / 2));
+                    else if (CrossedColumn)
+                        g.DrawLine(new Pen(Color.Black, 3), new Point(BUTTON_SIZE / 2, 0), new Point(BUTTON_SIZE / 2, BUTTON_SIZE));
+                    else if (CrossedDiagonalLeft)
+                        g.DrawLine(new Pen(Color.Black, 3), new Point(0, 0), new Point(BUTTON_SIZE, BUTTON_SIZE));
+                    else if (CrossedDiagonalRight)
+                        g.DrawLine(new Pen(Color.Black, 3), new Point(BUTTON_SIZE, 0), new Point(0, BUTTON_SIZE));
                 }
             }
-  
         }
         #endregion
-
     }
 }

@@ -21,10 +21,10 @@ namespace ICSHP_SEM_Le
         {
             StreamReader savedGameFile = new StreamReader(fileStream);
             if (char.TryParse(savedGameFile.ReadLine(), out char turnChar) && IsPlayerChar(turnChar)
-                && int.TryParse(savedGameFile.ReadLine(), out boardSize) 
+                && int.TryParse(savedGameFile.ReadLine(), out boardSize)
                 && boardSize >= GameBoard.MIN_BOARD_SIZE && boardSize <= GameBoard.MAX_BOARD_SIZE)
             {
-                XsTurn = (turnChar == 'x') ? true : false;
+                XsTurn = (turnChar == 'x');
                 board = new bool?[boardSize, boardSize];
                 Regex regex = new Regex("[x,o,#]{" + boardSize + "}");
                 for (int i = 0; i < boardSize; i++)
@@ -34,20 +34,13 @@ namespace ICSHP_SEM_Le
                         throw new ArgumentException("Not a valid saveGame file");
                     for (int j = 0; j < boardSize; j++)
                     {
-                        switch (line[j])
+                        board[i, j] = (line[j]) switch
                         {
-                            case 'x':
-                                board[i, j] = true;
-                                break;
-                            case 'o':
-                                board[i, j] = false;
-                                break;
-                            case '#':
-                                board[i, j] = null;
-                                break;
-                            default:
-                                throw new ArgumentException("Not a valid saveGame file");
-                        }
+                            'x' => true,
+                            'o' => false,
+                            '#' => null,
+                            _ => throw new ArgumentException("Not a valid saveGame file"),
+                        };
                     }
                 }
                 //if there are more lines than expected
