@@ -47,6 +47,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BoardButton.cs" />
+    <Compile Include="CrossOutType.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GameBoard.cs" />
     <Compile Include="GameForm.cs">

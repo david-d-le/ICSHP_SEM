@@ -1,23 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Collections.Generic;
 
 namespace ICSHP_SEM_Le
 {
-    public class GameBoard
+    public partial class GameBoard
     {
         #region constants
         private const int BUTTON_SIZE = 30; // can't be changed
         private const int STEPS = 50;
         private const int STEPS_HALF = STEPS / 2;
+        private const int CROSS_OUT_STEPS = 25;
         public const int MIN_BOARD_SIZE = 5;
         public const int MAX_BOARD_SIZE = 30;
-
         #endregion
 
         #region GameBoard properties and attributes
@@ -76,9 +73,7 @@ namespace ICSHP_SEM_Le
                 g.DrawLine(new Pen(Color.Red, 3), new PointF(25, 5), new PointF(BUTTON_SIZE - 5 - (step - STEPS_HALF) / (STEPS_HALF / 20f), 5 + (step - STEPS_HALF) / (STEPS_HALF / 20f)));
             }
             else
-            {
                 g.DrawLine(new Pen(Color.Red, 3), new Point(5, 5), new PointF(step / (STEPS_HALF / 20f) + 5, step / (STEPS_HALF / 20f) + 5));
-            }
 
         }
 
@@ -91,10 +86,7 @@ namespace ICSHP_SEM_Le
         {
             Buttons[i, j].Graphics = Buttons[i, j].CreateGraphics();
             Graphics g = Buttons[i, j].Graphics;
-            Timer timer1 = new Timer
-            {
-                Interval = 1 // in miliseconds
-            };
+            Timer timer1 = new Timer{Interval = 1};
             int step = 0;
 
             switch (player)
@@ -134,26 +126,77 @@ namespace ICSHP_SEM_Le
                     throw new ArgumentException("Not a valid boolean value");
             }
         }
-
-        private void CrossOutButton(int x, int y, float startX, float startY, float endX, float endY, Graphics g)
+        private void CrossOutButton(int x, int y, int i, int step, CrossOutType type)
         {
-            g.DrawLine(new Pen(Color.Black, 3), new PointF(startX, startY), new PointF(endX, endY));
+            switch (type)
+            {
+                case CrossOutType.Row:
+                    Buttons[x, y - i].Graphics.DrawLine(new Pen(Color.Black, 3), new PointF(0, BUTTON_SIZE / 2), new PointF(BUTTON_SIZE * (step / (float)CROSS_OUT_STEPS), BUTTON_SIZE / 2));
+                    break;
+                case CrossOutType.Column:
+                    Buttons[x - i, y].Graphics.DrawLine(new Pen(Color.Black, 3), new PointF(BUTTON_SIZE / 2, 0), new PointF(BUTTON_SIZE / 2, BUTTON_SIZE * (step / (float)CROSS_OUT_STEPS)));
+                    break;
+                case CrossOutType.LeftDiagonal:
+                    Buttons[x - i, y - i].Graphics.DrawLine(new Pen(Color.Black, 3), new PointF(0, 0), new PointF(BUTTON_SIZE * (step / (float)CROSS_OUT_STEPS), BUTTON_SIZE * (step / (float)CROSS_OUT_STEPS)));
+                    break;
+                case CrossOutType.RightDiagonal:
+                    float calcX = BUTTON_SIZE - (float)(BUTTON_SIZE * (step / (float)CROSS_OUT_STEPS));
+                    float calcY = BUTTON_SIZE * (step / (float)CROSS_OUT_STEPS);
+                    Buttons[x - i, y + i].Graphics.DrawLine(new Pen(Color.Black, 3), new PointF(BUTTON_SIZE, 0), new PointF(calcX, calcY));
+                    break;
+                default:
+                    break;
+            }
         }
-        private void CrossOutRow(int rowL, int rowR, int x, int y)
+
+        private void CrossOutWinner(int rowL, int rowR, int diagLU, int diagRD, int diagLD, int diagRU, int columnU, int columnD, int x, int y)
+        {
+            if (rowL + rowR + 1 >= 5)
+                CrossOut(rowL, rowR, x, y, CrossOutType.Row);
+            else if (columnU + columnD + 1 >= 5)
+                CrossOut(columnU, columnD, x, y, CrossOutType.Column);
+            else if (diagLU + diagRD + 1 >= 5)
+                CrossOut(diagLU, diagRD, x, y, CrossOutType.LeftDiagonal);
+            else if (diagLD + diagRU + 1 >= 5)
+                CrossOut(diagRU, diagLD, x, y, CrossOutType.RightDiagonal);
+        }
+
+        private void ChangeCrossedBool(int x , int y, int i, CrossOutType type)
+        {
+            switch (type)
+            {
+                case CrossOutType.Row:
+                    Buttons[x, y - i].CrossOutType = type;
+                    break;
+                case CrossOutType.Column:
+                    Buttons[x -i, y].CrossOutType = type;
+                    break;
+                case CrossOutType.LeftDiagonal:
+                    Buttons[x - i, y - i].CrossOutType = type;
+                    break;
+                case CrossOutType.RightDiagonal:
+                    Buttons[x - i, y + i].CrossOutType = type;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void CrossOut(int startSideCount, int endSideCount, int x, int y, CrossOutType type)
         {
             Queue<Timer> timerStack = new Queue<Timer>();
-            for (int i = rowL; i >= 1; i--)
+            for (int i = startSideCount; i >= 1; i--)
             {
-                Timer timer1 = new Timer{Interval = 1};
+                Timer timer1 = new Timer { Interval = 1 };
                 int step = 0;
-                BoardButton button = Buttons[x, y - i];
+                int actualI = i;
                 timer1.Tick += delegate (object sender2, EventArgs e2)
                 {
-                    if (step < 25)
-                        CrossOutButton(x, y - i, 0, BUTTON_SIZE / 2, BUTTON_SIZE * (step++ / 25f), BUTTON_SIZE / 2, button.CreateGraphics());
+                    if (step < CROSS_OUT_STEPS)
+                        CrossOutButton(x, y, actualI, step++, type);
                     else
                     {
-                        button.CrossedRow = true;
+                        ChangeCrossedBool(x, y, actualI, type);
                         timer1.Stop();
                         if (timerStack.Count > 0)
                             timerStack.Dequeue().Start();
@@ -162,33 +205,34 @@ namespace ICSHP_SEM_Le
                 timerStack.Enqueue(timer1);
             }
             // clicked button
-            Timer timer2 = new Timer{Interval = 1};
+            Timer timer2 = new Timer { Interval = 1 };
             int step2 = 0;
             timer2.Tick += delegate (object sender2, EventArgs e2)
             {
                 if (step2 < 25)
-                    CrossOutButton(x, y, 0, BUTTON_SIZE / 2, BUTTON_SIZE * (step2++ / 25f), BUTTON_SIZE / 2, Buttons[x, y].CreateGraphics());
+                    CrossOutButton(x, y, 0, step2++, type);
                 else
                 {
+                    ChangeCrossedBool(x, y, 0, type);
                     timer2.Stop();
                     if (timerStack.Count > 0)
                         timerStack.Dequeue().Start();
                 }
             };
-            Buttons[x, y].CrossedRow = true;
+            
             timerStack.Enqueue(timer2);
-            for (int i = 1; i <= rowR; i++)
+            for (int i = 1; i <= endSideCount; i++)
             {
                 Timer timer1 = new Timer { Interval = 1 };
                 int step = 0;
-                BoardButton button = Buttons[x, y + i];
+                int actualI = -1*i;
                 timer1.Tick += delegate (object sender2, EventArgs e2)
                 {
                     if (step < 25)
-                        CrossOutButton(x, y + i, 0, BUTTON_SIZE / 2, BUTTON_SIZE * (step++ / 25f), BUTTON_SIZE / 2, button.CreateGraphics());
+                        CrossOutButton(x, y, actualI, step++, type);
                     else
                     {
-                        button.CrossedRow = true;
+                        ChangeCrossedBool(x, y, actualI, type);
                         timer1.Stop();
                         if (timerStack.Count > 0)
                             timerStack.Dequeue().Start();
@@ -198,65 +242,6 @@ namespace ICSHP_SEM_Le
             }
 
             timerStack.Dequeue().Start();
-        }
-
-        private void CrossOutColumn(int columnU, int columnD, int x, int y)
-        {
-            for (int i = 1; i <= columnU; i++)
-            {
-                Buttons[x - i, y].CrossedColumn = true;
-                ////CrossOutButton(x - i, y, BUTTON_SIZE / 2, 0, BUTTON_SIZE / 2, BUTTON_SIZE);
-            }
-            Buttons[x, y].CrossedColumn = true;
-            ////CrossOutButton(x, y, BUTTON_SIZE / 2, 0, BUTTON_SIZE / 2, BUTTON_SIZE);
-            for (int i = 1; i <= columnD; i++)
-            {
-                Buttons[x + i, y].CrossedColumn = true;
-                ////CrossOutButton(x + i, y, BUTTON_SIZE / 2, 0, BUTTON_SIZE / 2, BUTTON_SIZE);
-            }
-        }
-
-        private void CrossOutDiagonalLeft(int diagLU, int diagRD, int x, int y)
-        {
-            for (int i = 1; i <= diagLU; i++)
-            {
-                Buttons[x - i, y - i].CrossedDiagonalLeft = true;
-                ////CrossOutButton(x - i, y - i, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
-            }
-            Buttons[x, y].CrossedDiagonalLeft = true;
-            ////CrossOutButton(x, y, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
-            for (int i = 1; i <= diagRD; i++)
-            {
-                Buttons[x + i, y + i].CrossedDiagonalLeft = true;
-                ////CrossOutButton(x + i, y + i, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
-            }
-        }
-
-        private void CrossOutDiagonalRight(int diagLD, int diagRU, int x, int y)
-        {
-            for (int i = 1; i <= diagLD; i++)
-            {
-                Buttons[x + i, y - i].CrossedDiagonalRight = true;
-                ////CrossOutButton(x + i, y - i, BUTTON_SIZE, 0, 0, BUTTON_SIZE);
-            }
-            Buttons[x, y].CrossedDiagonalRight = true;
-            ////CrossOutButton(x, y, BUTTON_SIZE, 0, 0, BUTTON_SIZE);
-            for (int i = 1; i <= diagRU; i++)
-            {
-                Buttons[x - i, y + i].CrossedDiagonalRight = true;
-                ////CrossOutButton(x - i, y + i, BUTTON_SIZE, 0, 0, BUTTON_SIZE);
-            }
-        }
-        private void CrossOutWinner(int rowL, int rowR, int diagLU, int diagRD, int diagLD, int diagRU, int columnU, int columnD, int x, int y)
-        {
-            if (rowL + rowR + 1 >= 5)
-                CrossOutRow(rowL, rowR, x, y);
-            else if (columnU + columnD + 1 >= 5)
-                CrossOutColumn(columnU, columnD, x, y);
-            else if (diagLU + diagRD + 1 >= 5)
-                CrossOutDiagonalLeft(diagLU, diagRD, x, y);
-            else if (diagLD + diagRU + 1 >= 5)
-                CrossOutDiagonalRight(diagLD, diagRU, x, y);
         }
 
         private void CheckWinnerFromLastClick(int i, int j, bool xClicked)
@@ -290,6 +275,7 @@ namespace ICSHP_SEM_Le
                 }
                 if (j + k < boardSize)
                 {
+                    //row right side
                     rowRBool = rowRBool && xClicked == Buttons[i, j + k].XClicked;
                     rowR = rowRBool ? ++rowR : rowR;
                     //diagonal up right side
@@ -325,8 +311,6 @@ namespace ICSHP_SEM_Le
                 myForm.SetWinnerLabelText(message);                
                 CrossOutWinner(rowL, rowR, diagLU, diagRD, diagLD, diagRU, columnU, columnD, i, j);
                 GameObject.GameOver = true;
-
-                //TODO cross out winner
             }
             else if (NumOfFreeButtons <= 0)
             {
@@ -493,59 +477,5 @@ namespace ICSHP_SEM_Le
             }
             return ss.ToString();
         }
-
-        #region custom Button class
-        public class BoardButton : Button
-        {
-            #region BoardButton properties
-            public bool? XClicked { get; set; }
-            public bool Painted { get; set; }
-            public bool CrossedRow { get; set; }
-            public bool CrossedColumn { get; set; }
-            public bool CrossedDiagonalLeft { get; set; }
-            public bool CrossedDiagonalRight { get; set; }
-
-            public Graphics Graphics { get; set; }
-            #endregion
-
-            #region BoardButton constructors
-            public BoardButton(){
-            }
-
-            public BoardButton(bool xClicked)
-            {
-                XClicked = xClicked;
-            }
-            #endregion
-
-            protected override void OnPaint(PaintEventArgs pevent)
-            {
-                base.OnPaint(pevent);
-                if (Painted)
-                {
-                    Graphics g = pevent.Graphics;
-                    if (XClicked == true)
-                    {
-                        g.Clear(Color.Transparent);
-                        g.FillRectangle(Brushes.White, new Rectangle(1, 1, BUTTON_SIZE - 2, BUTTON_SIZE - 2));
-                        g.DrawLine(new Pen(Color.Red, 3), new Point(5, 5), new Point(BUTTON_SIZE - 5, BUTTON_SIZE - 5));
-                        g.DrawLine(new Pen(Color.Red, 3), new Point(BUTTON_SIZE - 5, 5), new Point(5, BUTTON_SIZE - 5));
-                    }
-                    else if (XClicked == false)
-                    {
-                        g.DrawArc(new Pen(Color.Blue, 3), new Rectangle(5, 5, 20, 20), 0, 360);
-                    }
-                    if (CrossedRow)
-                        g.DrawLine(new Pen(Color.Black, 3), new Point(0, BUTTON_SIZE / 2), new Point(BUTTON_SIZE, BUTTON_SIZE / 2));
-                    else if (CrossedColumn)
-                        g.DrawLine(new Pen(Color.Black, 3), new Point(BUTTON_SIZE / 2, 0), new Point(BUTTON_SIZE / 2, BUTTON_SIZE));
-                    else if (CrossedDiagonalLeft)
-                        g.DrawLine(new Pen(Color.Black, 3), new Point(0, 0), new Point(BUTTON_SIZE, BUTTON_SIZE));
-                    else if (CrossedDiagonalRight)
-                        g.DrawLine(new Pen(Color.Black, 3), new Point(BUTTON_SIZE, 0), new Point(0, BUTTON_SIZE));
-                }
-            }
-        }
-        #endregion
     }
 }
