@@ -47,10 +47,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BoardButton.cs" />
-    <Compile Include="CrossOutType.cs" />
-    <Compile Include="Game.cs" />
-    <Compile Include="GameBoard.cs" />
     <Compile Include="GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -94,6 +90,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GameEngine\GameEngine.csproj">
+      <Project>{0b2424b8-6e05-4b0c-aa94-750def77c70a}</Project>
+      <Name>GameEngine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

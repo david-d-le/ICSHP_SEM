@@ -11,12 +11,12 @@ namespace ICSHP_SEM_Le
             InitializeComponent();
         }
 
-        private void endBtn_Click(object sender, EventArgs e)
+        private void EndBtn_Click(object sender, EventArgs e)
         {
             Close();
         }
 
-        private void loadGameBtn_Click(object sender, EventArgs e)
+        private void LoadGameBtn_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
             if (dialog.ShowDialog() != DialogResult.OK)
@@ -37,10 +37,10 @@ namespace ICSHP_SEM_Le
             fileStream.Close();
         }
 
-        private void newGameBtn_Click(object sender, EventArgs e)
+        private void NewGameBtn_Click(object sender, EventArgs e)
         {
-            
-            string input = InputDialog.Show($"Insert board size from {GameBoard.MIN_BOARD_SIZE} to {GameBoard.MAX_BOARD_SIZE}. Board will have n*n dimmension","Insert size");
+
+            string input = InputDialog.Show($"Insert board size from {GameBoard.MIN_BOARD_SIZE} to {GameBoard.MAX_BOARD_SIZE}. Board will have n*n dimmension", "Insert size");
             if (input == "")
                 return;
             else if (int.TryParse(input, out int size) && size >= GameBoard.MIN_BOARD_SIZE && size <= GameBoard.MAX_BOARD_SIZE)
@@ -54,7 +54,7 @@ namespace ICSHP_SEM_Le
             {
                 MessageBox.Show("Invalid board size. Please insert whole numbers only from 5 to 30", "Invalid input", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-            
+
         }
 
         private void MainMenuForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -62,7 +62,7 @@ namespace ICSHP_SEM_Le
             DialogResult result = MessageBox.Show("Are you sure you want to leave?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
                 e.Cancel = false;
-            else 
+            else
                 e.Cancel = true;
         }
     }

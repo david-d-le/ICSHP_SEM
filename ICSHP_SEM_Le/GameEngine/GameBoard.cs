@@ -86,7 +86,7 @@ namespace ICSHP_SEM_Le
         {
             Buttons[i, j].Graphics = Buttons[i, j].CreateGraphics();
             Graphics g = Buttons[i, j].Graphics;
-            Timer timer1 = new Timer{Interval = 1};
+            Timer timer1 = new Timer { Interval = 1 };
             int step = 0;
 
             switch (player)
@@ -161,7 +161,7 @@ namespace ICSHP_SEM_Le
                 CrossOut(diagRU, diagLD, x, y, CrossOutType.RightDiagonal);
         }
 
-        private void ChangeCrossedBool(int x , int y, int i, CrossOutType type)
+        private void ChangeCrossedBool(int x, int y, int i, CrossOutType type)
         {
             switch (type)
             {
@@ -169,7 +169,7 @@ namespace ICSHP_SEM_Le
                     Buttons[x, y - i].CrossOutType = type;
                     break;
                 case CrossOutType.Column:
-                    Buttons[x -i, y].CrossOutType = type;
+                    Buttons[x - i, y].CrossOutType = type;
                     break;
                 case CrossOutType.LeftDiagonal:
                     Buttons[x - i, y - i].CrossOutType = type;
@@ -219,13 +219,13 @@ namespace ICSHP_SEM_Le
                         timerStack.Dequeue().Start();
                 }
             };
-            
+
             timerStack.Enqueue(timer2);
             for (int i = 1; i <= endSideCount; i++)
             {
                 Timer timer1 = new Timer { Interval = 1 };
                 int step = 0;
-                int actualI = -1*i;
+                int actualI = -1 * i;
                 timer1.Tick += delegate (object sender2, EventArgs e2)
                 {
                     if (step < 25)
@@ -244,10 +244,11 @@ namespace ICSHP_SEM_Le
             timerStack.Dequeue().Start();
         }
 
+        public delegate void WriteWinnerEventHandler(bool? xClicked);
+
+        public event WriteWinnerEventHandler WinnerChanged;
         private void CheckWinnerFromLastClick(int i, int j, bool xClicked)
         {
-            GameForm myForm = Buttons[0, 0].FindForm() as GameForm;
-
             int rowL, rowR, columnD, columnU, diagLU, diagLD, diagRU, diagRD;
             bool rowLBool, rowRBool, columnDBool, columnUBool, diagLUBool, diagLDBool, diagRUBool, diagRDBool;
             rowLBool = rowRBool = columnDBool = columnUBool = diagLUBool = diagLDBool = diagRUBool = diagRDBool = true;
@@ -306,33 +307,20 @@ namespace ICSHP_SEM_Le
             }
             if (rowL + rowR + 1 >= 5 || diagLU + diagRD + 1 >= 5 || diagLD + diagRU + 1 >= 5 || columnU + columnD + 1 >= 5)
             {
-                string message = xClicked ? "Player X wins" : "Player O wins";
-                myForm.SetWinnerLabelFontColor(xClicked);
-                myForm.SetWinnerLabelText(message);                
+                WinnerChanged?.Invoke(xClicked);
                 CrossOutWinner(rowL, rowR, diagLU, diagRD, diagLD, diagRU, columnU, columnD, i, j);
                 GameObject.GameOver = true;
             }
             else if (NumOfFreeButtons <= 0)
             {
-                myForm.SetWinnerLabelFontColor(null);
-                myForm.SetWinnerLabelText("It's a tie");
-                MessageBox.Show("It's a tie", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                WinnerChanged?.Invoke(null);
                 GameObject.GameOver = true;
             }
         }
 
-        private void TogglePlayer()
-        {
-            GameForm myForm = Buttons[0, 0].FindForm() as GameForm;
-            if (GameObject.GameOver == true)
-            {
-                myForm.SetPlayerLabelText("");
-                return;
-            }
-            GameObject.XsTurn = !GameObject.XsTurn;
-            myForm.SetPlayerLabelFontColor(GameObject.XsTurn);
-            myForm.SetPlayerLabelText(GameObject.XsTurnToString());
-        }
+        public delegate void TogglePlayerEventHandler();
+
+        public event TogglePlayerEventHandler PlayerChange;
 
         void Button_Click(object sender, EventArgs e, int i, int j)
         {
@@ -343,7 +331,7 @@ namespace ICSHP_SEM_Le
             button.XClicked = GameObject.XsTurn;
             Draw(i, j, GameObject.XsTurn);
             CheckWinnerFromLastClick(i, j, (bool)button.XClicked);
-            TogglePlayer();
+            PlayerChange?.Invoke();
         }
 
         private bool CheckRowsAndColumns(int boardSize, bool?[,] board)

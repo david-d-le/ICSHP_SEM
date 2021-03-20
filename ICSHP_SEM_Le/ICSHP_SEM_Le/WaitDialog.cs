@@ -40,7 +40,7 @@ namespace ICSHP_SEM_Le
             Prompt.Show();
             Prompt.Refresh();
         }
-        
+
         public void Close()
         {
             Prompt.Close();

@@ -21,11 +21,34 @@ namespace ICSHP_SEM_Le
 
         public Game GameObject { get; set; }
 
+        #region events
+        private void TogglePlayer()
+        {
+            if (GameObject.GameOver == true)
+            {
+                SetPlayerLabelText("");
+                return;
+            }
+            GameObject.XsTurn = !GameObject.XsTurn;
+            SetPlayerLabelFontColor(GameObject.XsTurn);
+            SetPlayerLabelText(GameObject.XsTurnToString());
+        }
+
+        private void WinnerChanged(bool? xClicked)
+        {
+            SetWinnerLabelFontColor(xClicked);
+            string message = (xClicked == true) ? "Player X wins" : (xClicked == false ? "Player O wins" : "It's a tie");
+            SetWinnerLabelText(message);
+        }
+        #endregion
+
         public GameForm(Form mainMenu, Game game)
         {
             this.mainMenu = mainMenu;
             GameObject = game;
             InitializeComponent();
+            game.GameBoard.PlayerChange += TogglePlayer;
+            game.GameBoard.WinnerChanged += WinnerChanged;
         }
 
         private void GameForm_Load(object sender, EventArgs e)

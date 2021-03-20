@@ -47,7 +47,7 @@ namespace ICSHP_SEM_Le
             this.endBtn.TabIndex = 1;
             this.endBtn.Text = "End Game";
             this.endBtn.UseVisualStyleBackColor = true;
-            this.endBtn.Click += new System.EventHandler(this.endBtn_Click);
+            this.endBtn.Click += new System.EventHandler(this.EndBtn_Click);
             // 
             // groupBox1
             // 
@@ -69,7 +69,7 @@ namespace ICSHP_SEM_Le
             this.newGameBtn.TabIndex = 3;
             this.newGameBtn.Text = "New Game";
             this.newGameBtn.UseVisualStyleBackColor = true;
-            this.newGameBtn.Click += new System.EventHandler(this.newGameBtn_Click);
+            this.newGameBtn.Click += new System.EventHandler(this.NewGameBtn_Click);
             // 
             // loadGameBtn
             // 
@@ -80,7 +80,7 @@ namespace ICSHP_SEM_Le
             this.loadGameBtn.TabIndex = 2;
             this.loadGameBtn.Text = "Load saved game";
             this.loadGameBtn.UseVisualStyleBackColor = true;
-            this.loadGameBtn.Click += new System.EventHandler(this.loadGameBtn_Click);
+            this.loadGameBtn.Click += new System.EventHandler(this.LoadGameBtn_Click);
             // 
             // mainMenuLabel1
             // 
