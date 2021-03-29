@@ -1,10 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 
 namespace ICSHP_SEM_Le
 {
-    public class Game
+    [Serializable]
+    public class Game : ISerializable
     {
         #region Game properties and attributes
         public GameBoard GameBoard { get; set; }
@@ -57,6 +60,7 @@ namespace ICSHP_SEM_Le
             GameBoard = new GameBoard(this, boardSize, board);
         }
 
+        public Game() { }
 
         public Game(Stream fileStream)
         {
@@ -76,5 +80,52 @@ namespace ICSHP_SEM_Le
         {
             return XsTurn ? "x" : "o";
         }
+
+
+        #region Game Serialization
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("XsTurn", XsTurn, typeof(bool));
+            info.AddValue("GameOver", GameOver, typeof(bool));
+            info.AddValue("GameBoard", GameBoard, typeof(GameBoard));
+        }
+        public Game(SerializationInfo info, StreamingContext context)
+        {
+            try
+            {
+                XsTurn = (bool)info.GetValue("XsTurn", typeof(bool));
+                GameOver = (bool)info.GetValue("GameOver", typeof(bool));
+                GameBoard = (GameBoard)info.GetValue("GameBoard", typeof(GameBoard));
+            }
+            catch (Exception)
+            {
+                throw new SerializationException("Invalid saveGame file");
+            }
+        }
+
+        public void SerializeItem(string fileName)
+        {
+            IFormatter formatter = new BinaryFormatter();
+            FileStream s = new FileStream(fileName, FileMode.Create);
+            formatter.Serialize(s, this);
+            s.Close();
+        }
+
+        public static Game DeserializeItem(FileStream s)
+        {
+            IFormatter formatter = new BinaryFormatter();
+            if (s == null)
+                throw new SerializationException("Could not open file");
+            try
+            {
+                Game game = (Game)formatter.Deserialize(s);
+                return game;
+            }
+            catch (Exception)
+            {
+            }
+            throw new SerializationException("Invalid savegame file");
+        }
+        #endregion
     }
 }

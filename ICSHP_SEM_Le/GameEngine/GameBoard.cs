@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace ICSHP_SEM_Le
 {
-    public partial class GameBoard
+    [Serializable]
+    public partial class GameBoard : ISerializable
     {
         #region constants
         private const int BUTTON_SIZE = 30; // can't be changed
@@ -465,5 +469,59 @@ namespace ICSHP_SEM_Le
             }
             return ss.ToString();
         }
+
+
+
+
+
+
+
+
+
+        #region GameBoard serialization
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("NumOfFreeButtons", NumOfFreeButtons, typeof(int));
+            info.AddValue("boardSize", boardSize, typeof(int));
+            info.AddValue("gameObject", gameObject, typeof(Game));
+            bool?[,] buttonsBool = new bool?[boardSize, boardSize];
+            for (int i = 0; i < boardSize; i++)
+            {
+                for (int j = 0; j < boardSize; j++)
+                    buttonsBool[i, j] = Buttons[i, j].XClicked;
+            }
+            info.AddValue("buttonsBool", buttonsBool, typeof(bool?[,]));
+        }
+        public GameBoard(SerializationInfo info, StreamingContext context)
+        {
+            try
+            {
+                NumOfFreeButtons = (int)info.GetValue("NumOfFreeButtons", typeof(int));
+                boardSize = (int)info.GetValue("boardSize", typeof(int));
+                gameObject = (Game)info.GetValue("gameObject", typeof(Game));
+                bool?[,] buttonsBool = (bool?[,])info.GetValue("buttonsBool", typeof(bool?[,]));
+                GenerateButtons(boardSize, buttonsBool);
+            }
+            catch (Exception)
+            {
+                throw new SerializationException("Invalid saveGame file");
+            }
+        }
+
+        public void SerializeItem(string fileName)
+        {
+            IFormatter formatter = new BinaryFormatter();
+            FileStream s = new FileStream(fileName, FileMode.Append);
+            formatter.Serialize(s, this);
+            s.Close();
+        }
+
+        public static GameBoard DeserializeItem(FileStream s)
+        {
+            IFormatter formatter = new BinaryFormatter();
+            GameBoard gameBoard = (GameBoard)formatter.Deserialize(s);
+            return gameBoard;
+        }
+        #endregion
     }
 }

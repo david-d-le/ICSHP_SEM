@@ -69,22 +69,36 @@ namespace ICSHP_SEM_Le
 
         private void SaveGame()
         {
-            SaveFileDialog dialog = new SaveFileDialog();
-            dialog.Filter = "Text files (*.txt)|*.txt";
-            dialog.FileName = DateTime.UtcNow.ToString("MM-dd-yyyy");
-            if (dialog.ShowDialog() != DialogResult.OK)
+            SaveFileDialog dialog2 = new SaveFileDialog();
+            dialog2.Filter = "TicTacToe savegame file (*.save)|*.save|TicTacToe savegame file (*.txt)|*.txt";
+            dialog2.FileName = DateTime.UtcNow.ToString("MM-dd-yyyy");
+            if (dialog2.ShowDialog() != DialogResult.OK)
                 return;
-            Stream fileStream;
-            if ((fileStream = dialog.OpenFile()) != null)
+
+            try
             {
-                StreamWriter writer = new StreamWriter(fileStream, Encoding.UTF8);
-                writer.WriteLine(GameObject.XsTurnToString());
-                writer.WriteLine(GameObject.GameBoard.BoardSize);
-                writer.WriteLine(GameObject.GameBoard.BoardToString());
-                writer.Close();
-                fileStream.Close();
+                if (Path.GetExtension(dialog2.FileName).Equals(".save"))
+                    GameObject.SerializeItem(Path.GetFullPath(dialog2.FileName));
+                else if (Path.GetExtension(dialog2.FileName).Equals(".txt"))
+                {
+                    Stream fileStream;
+                    if ((fileStream = dialog2.OpenFile()) != null)
+                    {
+                        StreamWriter writer = new StreamWriter(fileStream, Encoding.UTF8);
+                        writer.WriteLine(GameObject.XsTurnToString());
+                        writer.WriteLine(GameObject.GameBoard.BoardSize);
+                        writer.WriteLine(GameObject.GameBoard.BoardToString());
+                        writer.Close();
+                        fileStream.Close();
+                    }
+                }
+                else
+                    throw new Exception("Invalid file extension");
             }
-            
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void GameForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -102,9 +116,7 @@ namespace ICSHP_SEM_Le
                     e.Cancel = false;
                 }
                 else
-                {
                     e.Cancel = true;
-                }
             }
         }
 

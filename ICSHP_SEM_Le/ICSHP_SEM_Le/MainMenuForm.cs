@@ -19,18 +19,31 @@ namespace ICSHP_SEM_Le
         private void LoadGameBtn_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "TicTacToe savegame file (*.save)|*.save|TicTacToe savegame file (*.txt)|*.txt";
             if (dialog.ShowDialog() != DialogResult.OK)
                 return;
 
             Stream fileStream = dialog.OpenFile();
             try
             {
-                Game game = new Game(fileStream);
+                Game game;
+                if (Path.GetExtension(dialog.FileName).Equals(".save"))
+                {
+                    game = Game.DeserializeItem(fileStream as FileStream);
+                }
+                else if (Path.GetExtension(dialog.FileName).Equals(".txt"))
+                {
+                    game = new Game(fileStream);
+                }
+                else
+                {
+                    throw new Exception("Invalid file extension");
+                }
                 GameForm form = new GameForm(this, game);
                 form.Show();
                 Hide();
             }
-            catch (ArgumentException ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -39,7 +52,6 @@ namespace ICSHP_SEM_Le
 
         private void NewGameBtn_Click(object sender, EventArgs e)
         {
-
             string input = InputDialog.Show($"Insert board size from {GameBoard.MIN_BOARD_SIZE} to {GameBoard.MAX_BOARD_SIZE}. Board will have n*n dimmension", "Insert size");
             if (input == "")
                 return;
@@ -54,7 +66,6 @@ namespace ICSHP_SEM_Le
             {
                 MessageBox.Show("Invalid board size. Please insert whole numbers only from 5 to 30", "Invalid input", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-
         }
 
         private void MainMenuForm_FormClosing(object sender, FormClosingEventArgs e)
