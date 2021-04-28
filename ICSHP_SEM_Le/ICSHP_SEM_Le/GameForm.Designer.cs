@@ -30,6 +30,8 @@ namespace ICSHP_SEM_Le
         private void InitializeComponent()
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.SaveGameBtn = new System.Windows.Forms.Button();
+            this.MovesList = new System.Windows.Forms.ListBox();
             this.mainMenuBtn = new System.Windows.Forms.Button();
             this.winnerLabel = new System.Windows.Forms.Label();
             this.playerLabel = new System.Windows.Forms.Label();
@@ -49,6 +51,8 @@ namespace ICSHP_SEM_Le
             // splitContainer1.Panel1
             // 
             this.splitContainer1.Panel1.AutoScroll = true;
+            this.splitContainer1.Panel1.Controls.Add(this.SaveGameBtn);
+            this.splitContainer1.Panel1.Controls.Add(this.MovesList);
             this.splitContainer1.Panel1.Controls.Add(this.mainMenuBtn);
             this.splitContainer1.Panel1.Controls.Add(this.winnerLabel);
             this.splitContainer1.Panel1.Controls.Add(this.playerLabel);
@@ -63,6 +67,32 @@ namespace ICSHP_SEM_Le
             this.splitContainer1.SplitterDistance = 300;
             this.splitContainer1.TabIndex = 0;
             // 
+            // SaveGameBtn
+            // 
+            this.SaveGameBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.SaveGameBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.SaveGameBtn.Location = new System.Drawing.Point(21, 529);
+            this.SaveGameBtn.Name = "SaveGameBtn";
+            this.SaveGameBtn.Size = new System.Drawing.Size(251, 63);
+            this.SaveGameBtn.TabIndex = 6;
+            this.SaveGameBtn.Text = "Save game";
+            this.SaveGameBtn.UseVisualStyleBackColor = true;
+            this.SaveGameBtn.Click += new System.EventHandler(this.SaveGameBtn_Click);
+            // 
+            // MovesList
+            // 
+            this.MovesList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.MovesList.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.MovesList.FormattingEnabled = true;
+            this.MovesList.ItemHeight = 25;
+            this.MovesList.Location = new System.Drawing.Point(21, 252);
+            this.MovesList.Name = "MovesList";
+            this.MovesList.Size = new System.Drawing.Size(250, 254);
+            this.MovesList.TabIndex = 5;
+            // 
             // mainMenuBtn
             // 
             this.mainMenuBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -74,13 +104,13 @@ namespace ICSHP_SEM_Le
             this.mainMenuBtn.TabIndex = 4;
             this.mainMenuBtn.Text = "Main menu";
             this.mainMenuBtn.UseVisualStyleBackColor = true;
-            this.mainMenuBtn.Click += new System.EventHandler(this.mainMenuBtn_Click);
+            this.mainMenuBtn.Click += new System.EventHandler(this.MainMenuBtn_Click);
             // 
             // winnerLabel
             // 
             this.winnerLabel.AutoSize = true;
             this.winnerLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.winnerLabel.Location = new System.Drawing.Point(12, 333);
+            this.winnerLabel.Location = new System.Drawing.Point(13, 205);
             this.winnerLabel.Name = "winnerLabel";
             this.winnerLabel.Size = new System.Drawing.Size(0, 44);
             this.winnerLabel.TabIndex = 3;
@@ -123,7 +153,7 @@ namespace ICSHP_SEM_Le
             this.Controls.Add(this.splitContainer1);
             this.Name = "GameForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "GameForm";
+            this.Text = "Tic Tac Toe";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GameForm_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.GameForm_FormClosed);
             this.Load += new System.EventHandler(this.GameForm_Load);
@@ -143,5 +173,7 @@ namespace ICSHP_SEM_Le
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label winnerLabel;
         private System.Windows.Forms.Button mainMenuBtn;
+        private System.Windows.Forms.ListBox MovesList;
+        private System.Windows.Forms.Button SaveGameBtn;
     }
 }

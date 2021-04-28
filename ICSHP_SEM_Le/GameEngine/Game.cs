@@ -2,7 +2,7 @@
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace ICSHP_SEM_Le
 {
@@ -13,66 +13,22 @@ namespace ICSHP_SEM_Le
         public GameBoard GameBoard { get; set; }
         public bool XsTurn { get; set; }
         public bool GameOver { get; set; }
+        public Replay Replay { get; set; }
+        public Timer ReplayTimer { get; set; }
         #endregion
 
         #region Game constructors and associated methods
-        private bool IsPlayerChar(char playerChar)
-        {
-            return (playerChar == 'x' || playerChar == 'o');
-        }
-        private void CheckSaveGameFileFormat(Stream fileStream, out int boardSize, out bool?[,] board)
-        {
-            StreamReader savedGameFile = new StreamReader(fileStream);
-            if (char.TryParse(savedGameFile.ReadLine(), out char turnChar) && IsPlayerChar(turnChar)
-                && int.TryParse(savedGameFile.ReadLine(), out boardSize)
-                && boardSize >= GameBoard.MIN_BOARD_SIZE && boardSize <= GameBoard.MAX_BOARD_SIZE)
-            {
-                XsTurn = (turnChar == 'x');
-                board = new bool?[boardSize, boardSize];
-                Regex regex = new Regex("[x,o,#]{" + boardSize + "}");
-                for (int i = 0; i < boardSize; i++)
-                {
-                    string line = savedGameFile.ReadLine();
-                    if (line == null || !regex.IsMatch(line))
-                        throw new ArgumentException("Not a valid saveGame file");
-                    for (int j = 0; j < boardSize; j++)
-                    {
-                        board[i, j] = (line[j]) switch
-                        {
-                            'x' => true,
-                            'o' => false,
-                            '#' => null,
-                            _ => throw new ArgumentException("Not a valid saveGame file"),
-                        };
-                    }
-                }
-                //if there are more lines than expected
-                string rest = savedGameFile.ReadToEnd().TrimEnd('\r', '\n');
-                if (rest.Length != 0)
-                    throw new ArgumentException("Not a valid saveGame file");
-                return;
-            }
-            throw new ArgumentException("Not a valid saveGame file");
-        }
-        private void LoadGame(Stream fileStream)
-        {
-            CheckSaveGameFileFormat(fileStream, out int boardSize, out bool?[,] board);
-            GameBoard = new GameBoard(this, boardSize, board);
-        }
-
-        public Game() { }
-
-        public Game(Stream fileStream)
+        public Game()
         {
             GameOver = false;
-            LoadGame(fileStream);
+            ReplayTimer = new Timer { Interval = 1000 };
         }
 
-        public Game(int baordSize)
+        public Game(int boardSize) : this()
         {
-            GameOver = false;
             XsTurn = true;
-            GameBoard = new GameBoard(this, baordSize);
+            GameBoard = new GameBoard(this, boardSize);
+            Replay = new Replay();
         }
         #endregion
 
@@ -82,12 +38,30 @@ namespace ICSHP_SEM_Le
         }
 
 
+        public void PlayReplay()
+        {
+            ReplayTimer.Tick += delegate (object sender2, EventArgs e2)
+            {
+                if (Replay.Moves.Count <= 0)
+                {
+                    ReplayTimer.Stop();
+                    return;
+                }
+                Move move = Replay.Moves.First.Value;
+                Replay.Moves.RemoveFirst();
+                GameBoard.Button_Click(GameBoard.Buttons[move.PositionX, move.PositionY], e2, move.PositionX, move.PositionY);
+            };
+            ReplayTimer.Start();
+        }
+
+
         #region Game Serialization
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("XsTurn", XsTurn, typeof(bool));
             info.AddValue("GameOver", GameOver, typeof(bool));
             info.AddValue("GameBoard", GameBoard, typeof(GameBoard));
+            info.AddValue("Replay", Replay, typeof(Replay));
         }
         public Game(SerializationInfo info, StreamingContext context)
         {
@@ -96,6 +70,8 @@ namespace ICSHP_SEM_Le
                 XsTurn = (bool)info.GetValue("XsTurn", typeof(bool));
                 GameOver = (bool)info.GetValue("GameOver", typeof(bool));
                 GameBoard = (GameBoard)info.GetValue("GameBoard", typeof(GameBoard));
+                Replay = (Replay)info.GetValue("Replay", typeof(Replay));
+                ReplayTimer = new Timer { Interval = 1000 };
             }
             catch (Exception)
             {
@@ -118,8 +94,7 @@ namespace ICSHP_SEM_Le
                 throw new SerializationException("Could not open file");
             try
             {
-                Game game = (Game)formatter.Deserialize(s);
-                return game;
+                return (Game)formatter.Deserialize(s);
             }
             catch (Exception)
             {

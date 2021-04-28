@@ -18,7 +18,7 @@ namespace ICSHP_SEM_Le
         private const int STEPS_HALF = STEPS / 2;
         private const int CROSS_OUT_STEPS = 25;
         public const int MIN_BOARD_SIZE = 5;
-        public const int MAX_BOARD_SIZE = 30;
+        public const int MAX_BOARD_SIZE = 20;
         #endregion
 
         #region GameBoard properties and attributes
@@ -323,10 +323,12 @@ namespace ICSHP_SEM_Le
         }
 
         public delegate void TogglePlayerEventHandler();
-
         public event TogglePlayerEventHandler PlayerChange;
 
-        void Button_Click(object sender, EventArgs e, int i, int j)
+        public delegate void AddMoveEventHandler();
+        public event AddMoveEventHandler AddMove;
+
+        public void Button_Click(object sender, EventArgs e, int i, int j)
         {
             BoardButton button = sender as BoardButton;
             if (button.XClicked != null || gameObject.GameOver)
@@ -334,6 +336,11 @@ namespace ICSHP_SEM_Le
             --NumOfFreeButtons;
             button.XClicked = GameObject.XsTurn;
             Draw(i, j, GameObject.XsTurn);
+            if (GameObject.Replay != null)
+            {
+                GameObject.Replay.Moves.AddLast(new Move(i, j, GameObject.XsTurn));
+                AddMove?.Invoke();
+            }
             CheckWinnerFromLastClick(i, j, (bool)button.XClicked);
             PlayerChange?.Invoke();
         }
@@ -469,13 +476,6 @@ namespace ICSHP_SEM_Le
             }
             return ss.ToString();
         }
-
-
-
-
-
-
-
 
 
         #region GameBoard serialization

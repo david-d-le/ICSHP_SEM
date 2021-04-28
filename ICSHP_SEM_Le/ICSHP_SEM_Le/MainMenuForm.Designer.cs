@@ -31,6 +31,7 @@ namespace ICSHP_SEM_Le
         {
             this.endBtn = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.replayBtn = new System.Windows.Forms.Button();
             this.newGameBtn = new System.Windows.Forms.Button();
             this.loadGameBtn = new System.Windows.Forms.Button();
             this.mainMenuLabel1 = new System.Windows.Forms.Label();
@@ -41,7 +42,7 @@ namespace ICSHP_SEM_Le
             // endBtn
             // 
             this.endBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.endBtn.Location = new System.Drawing.Point(6, 133);
+            this.endBtn.Location = new System.Drawing.Point(6, 189);
             this.endBtn.Name = "endBtn";
             this.endBtn.Size = new System.Drawing.Size(200, 50);
             this.endBtn.TabIndex = 1;
@@ -51,14 +52,26 @@ namespace ICSHP_SEM_Le
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.replayBtn);
             this.groupBox1.Controls.Add(this.newGameBtn);
             this.groupBox1.Controls.Add(this.loadGameBtn);
             this.groupBox1.Controls.Add(this.endBtn);
-            this.groupBox1.Location = new System.Drawing.Point(558, 202);
+            this.groupBox1.Location = new System.Drawing.Point(558, 146);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(212, 189);
+            this.groupBox1.Size = new System.Drawing.Size(212, 245);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
+            // 
+            // replayBtn
+            // 
+            this.replayBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.replayBtn.Location = new System.Drawing.Point(6, 133);
+            this.replayBtn.Name = "replayBtn";
+            this.replayBtn.Size = new System.Drawing.Size(200, 50);
+            this.replayBtn.TabIndex = 4;
+            this.replayBtn.Text = "Replay";
+            this.replayBtn.UseVisualStyleBackColor = true;
+            this.replayBtn.Click += new System.EventHandler(this.ReplayBtn_Click);
             // 
             // newGameBtn
             // 
@@ -110,10 +123,13 @@ namespace ICSHP_SEM_Le
             this.Controls.Add(this.label1);
             this.Controls.Add(this.mainMenuLabel1);
             this.Controls.Add(this.groupBox1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "MainMenuForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Tick Tack Toe - David Le";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainMenuForm_FormClosing);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.MainMenuForm_Paint);
             this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -127,5 +143,6 @@ namespace ICSHP_SEM_Le
         private System.Windows.Forms.Label mainMenuLabel1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button newGameBtn;
+        private System.Windows.Forms.Button replayBtn;
     }
 }

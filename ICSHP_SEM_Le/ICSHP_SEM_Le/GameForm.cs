@@ -40,6 +40,12 @@ namespace ICSHP_SEM_Le
             string message = (xClicked == true) ? "Player X wins" : (xClicked == false ? "Player O wins" : "It's a tie");
             SetWinnerLabelText(message);
         }
+
+        private void AddMove()
+        {
+            MovesList.Items.Add(GameObject.Replay.Moves.Last());
+        }
+
         #endregion
 
         public GameForm(Form mainMenu, Game game)
@@ -49,6 +55,16 @@ namespace ICSHP_SEM_Le
             InitializeComponent();
             game.GameBoard.PlayerChange += TogglePlayer;
             game.GameBoard.WinnerChanged += WinnerChanged;
+            game.GameBoard.AddMove += AddMove;
+            
+        }
+
+        public GameForm(Form mainMenu, Game game, bool isReplay) : this(mainMenu, game)
+        {
+            if (isReplay)
+                SaveGameBtn.Visible = false;
+            else
+                MovesList.Items.AddRange(GameObject.Replay.Moves.ToArray());
         }
 
         private void GameForm_Load(object sender, EventArgs e)
@@ -69,28 +85,25 @@ namespace ICSHP_SEM_Le
 
         private void SaveGame()
         {
-            SaveFileDialog dialog2 = new SaveFileDialog();
-            dialog2.Filter = "TicTacToe savegame file (*.save)|*.save|TicTacToe savegame file (*.txt)|*.txt";
-            dialog2.FileName = DateTime.UtcNow.ToString("MM-dd-yyyy");
+            if (GameObject.Replay.Moves.Count == 0)
+            {
+                MessageBox.Show("Cannot save game for zero moves", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+            SaveFileDialog dialog2 = new SaveFileDialog
+            {
+                Filter = "TicTacToe savegame file (*.save)|*.save",
+                FileName = DateTime.UtcNow.ToString("MM-dd-yyyy-HH-mm-ss")
+            };
             if (dialog2.ShowDialog() != DialogResult.OK)
                 return;
 
             try
             {
                 if (Path.GetExtension(dialog2.FileName).Equals(".save"))
-                    GameObject.SerializeItem(Path.GetFullPath(dialog2.FileName));
-                else if (Path.GetExtension(dialog2.FileName).Equals(".txt"))
                 {
-                    Stream fileStream;
-                    if ((fileStream = dialog2.OpenFile()) != null)
-                    {
-                        StreamWriter writer = new StreamWriter(fileStream, Encoding.UTF8);
-                        writer.WriteLine(GameObject.XsTurnToString());
-                        writer.WriteLine(GameObject.GameBoard.BoardSize);
-                        writer.WriteLine(GameObject.GameBoard.BoardToString());
-                        writer.Close();
-                        fileStream.Close();
-                    }
+                    GameObject.SerializeItem(Path.GetFullPath(dialog2.FileName));
+                    MessageBox.Show("Game saved successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                     throw new Exception("Invalid file extension");
@@ -105,6 +118,8 @@ namespace ICSHP_SEM_Le
         {
             if (GameObject.GameOver == false)
             {
+                if (SaveGameBtn.Visible == false)
+                    GameObject.ReplayTimer.Stop();
                 if (MessageBox.Show("Do you want to exit from this game?", "Confirmation",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
@@ -116,7 +131,10 @@ namespace ICSHP_SEM_Le
                     e.Cancel = false;
                 }
                 else
+                {
                     e.Cancel = true;
+                    GameObject.ReplayTimer.Start();
+                }
             }
         }
 
@@ -149,15 +167,21 @@ namespace ICSHP_SEM_Le
                 winnerLabel.ForeColor = playerXWins == true ? Color.Red : Color.Blue;
         }
 
-        public SplitterPanel GetSplitterPanel2() {
+        public SplitterPanel GetSplitterPanel2()
+        {
             return splitContainer1.Panel2;
         }
 
         #endregion
 
-        private void mainMenuBtn_Click(object sender, EventArgs e)
+        private void MainMenuBtn_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
+        }
+
+        private void SaveGameBtn_Click(object sender, EventArgs e)
+        {
+            SaveGame();
         }
     }
 }
