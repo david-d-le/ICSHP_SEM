@@ -9,7 +9,7 @@ This project is for ICSHP class at UPCE. It contains source files for simple TIC
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/czjsemnoobcz/ICSHP_SEM.git
+   git clone https://github.com/david-d-le/ICSHP_SEM.git
    ```
 2. Open project in Visual studio (created in 2019)   
 
